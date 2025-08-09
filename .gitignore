@@ -1,0 +1,10 @@
+# library files
+node_modules/
+
+.DS_Store
+
+# build output
+dist/
+
+# environment variables
+.env

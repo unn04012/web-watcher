@@ -1,0 +1,23 @@
+{
+  "name": "@web-watcher/crawler",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "serverless offline",
+    "build": "serverless package",
+    "deploy": "serverless deploy",
+    "deploy:prod": "serverless deploy --stage prod",
+    "test": "jest",
+    "logs": "serverless logs"
+  },
+  "dependencies": {
+    "@web-watcher/shared": "*",
+    "axios": "^1.11.0",
+    "playwright-aws-lambda": "^0.11.0",
+    "serverless": "^3.0.0"
+  },
+  "devDependencies": {
+    "jest": "^27.0.0",
+    "serverless-offline": "^8.0.0",
+    "serverless-plugin-typescript": "^2.1.0"
+  }
+}

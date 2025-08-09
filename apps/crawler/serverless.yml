@@ -1,0 +1,13 @@
+# serverless.yml
+service: web-watcher-crawler
+
+provider:
+  name: aws
+  environment:
+    APP_DOMAIN: ${param:domain}
+
+params:
+  prod:
+    domain: myapp.com
+  dev:
+    domain: preview.myapp.com

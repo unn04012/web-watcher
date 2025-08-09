@@ -1,0 +1,31 @@
+{
+  "name": "web-watcher",
+  "version": "1.0.0",
+  "description": "🔍 Smart web monitoring system that tracks website changes and sends intelligent notifications based on user-defined categories and interests",
+  "main": "index.js",
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "shared/*"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unn04012/web-watcher.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/unn04012/web-watcher/issues"
+  },
+  "homepage": "https://github.com/unn04012/web-watcher#readme",
+  "devDependencies": {
+    "@nx/workspace": "^17.0.0",
+    "nx": "^17.0.0",
+    "typescript": "^5.0.0",
+    "concurrently": "^8.0.0"
+  }
+}
