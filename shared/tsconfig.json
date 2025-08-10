@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "../../dist/shared",
+    "outDir": "./dist",
     "rootDir": "./src",
     "composite": true,
     "declaration": true,
