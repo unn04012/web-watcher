@@ -1,5 +1,9 @@
 export type CrawlDto = {
   /**
+   * Unique identifier for the crawl request
+   */
+  jobId: string;
+  /**
    * crawler URL
    */
   url: string;
