@@ -6,6 +6,6 @@ export class WebCrawlerConfig {
   get headless(): boolean {
     const headless = this._configReader.getOrDefault('WEB_CRAWLER_HEADLESS', 'true');
 
-    return Boolean(headless);
+    return headless === 'true' ? true : false;
   }
 }

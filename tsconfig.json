@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "lib": ["ES2022"],
+    "allowJs": true,
+    "outDir": "./dist",
+    "rootDir": "./",
+    "strict": true,
+    "moduleDetection": "auto",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "baseUrl": "./",
+    "paths": {
+      "@web-watcher/shared/*": ["packages/shared/src/*"],
+      "@web-watcher/shared": ["packages/shared/src/index.ts"],
+      "@web-watcher/database/*": ["packages/database/src/*"],
+      "@web-watcher/database": ["packages/database/src/index.ts"]
+    }
+  },
+  "include": ["packages/**/*", "apps/**/*", "scripts/**/*", "*.ts"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.test.ts"],
+  "ts-node": {
+    "esm": false,
+    "experimentalSpecifierResolution": "node"
+  }
+}
