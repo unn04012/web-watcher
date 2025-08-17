@@ -23,8 +23,11 @@
   "homepage": "https://github.com/unn04012/web-watcher#readme",
   "devDependencies": {
     "@nx/workspace": "^17.0.0",
+    "@types/jest": "^30.0.0",
+    "concurrently": "^8.0.0",
+    "jest": "^30.0.5",
     "nx": "^17.0.0",
-    "typescript": "^5.0.0",
-    "concurrently": "^8.0.0"
+    "ts-jest": "^29.4.1",
+    "typescript": "^5.0.0"
   }
 }

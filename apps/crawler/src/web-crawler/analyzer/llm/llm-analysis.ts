@@ -1,7 +1,8 @@
 import crypto from 'node:crypto';
 
-import { LLMAnalysisJSON, LLMAnalysisProps, LlmContent, LLMMetadata, LLMResponse } from './llm-analysis.types';
+import { LLMAnalysisProps, LlmContent, LLMMetadata } from './llm-analysis.types';
 import { Message } from '@anthropic-ai/sdk/resources/messages';
+import { ContentAnalyzeResult } from '../content-analyzer.interface';
 
 export class LLMAnalysis {
   private readonly _id: string;
@@ -14,6 +15,11 @@ export class LLMAnalysis {
   private readonly _llmMetadata: LLMMetadata;
   private readonly _createdAt: Date;
   private readonly _errorMessage?: string;
+
+  /**
+   * jobId from crawl request
+   */
+  private _jobId: string;
 
   private constructor(props: LLMAnalysisProps) {
     this._id = props.id;
@@ -54,7 +60,12 @@ export class LLMAnalysis {
   }
 
   // Getters
-
+  get id(): string {
+    return this._id;
+  }
+  get crawlId(): string {
+    return this._crawlId;
+  }
   get llmMetadata(): LLMMetadata {
     return this._llmMetadata;
   }
@@ -74,6 +85,10 @@ export class LLMAnalysis {
     return this.inputTokens + this.outputTokens;
   }
 
+  set jobId(jobId: string) {
+    this._jobId = jobId;
+  }
+
   static fromDynamoDBItem(item: any): LLMAnalysis {
     return new LLMAnalysis({
       id: item.id,
@@ -90,10 +105,15 @@ export class LLMAnalysis {
   }
 
   public toDynamoDBItem() {
+    if (!this._jobId) throw new Error('Job ID is not set for LLMAnalysis');
+
     return {
-      PK: `ANALYSIS#${this._id}`,
+      PK: `CRAWL#${this._crawlId}`,
       SK: `ANALYSIS#${this._id}`,
+      GSI1PK: `JOB#${this._jobId}`,
+      GSI1SK: `ANALYSIS#${this._createdAt.toISOString()}`,
       id: this._id,
+      crawlId: this._crawlId,
       type: this._type,
       model: this._model,
       content: JSON.stringify(this._content),
@@ -118,5 +138,19 @@ export class LLMAnalysis {
       createdAt: this._createdAt,
       errorMessage: this._errorMessage,
     };
+  }
+
+  /**
+   * llm에서 크롤링 한 결과를 분석한 analyze content를 가져옵니다.
+   * @returns
+   */
+  public getAnalyzeContent(): ContentAnalyzeResult {
+    const content = this._content.map((item) => {
+      // validate json string format
+      return JSON.parse(item.text);
+    });
+
+    return content[0];
+    // return JSON.parse();
   }
 }

@@ -12,7 +12,6 @@ export class Crawl {
   private readonly _keywords: string[];
   private readonly _categoryFilters: string[];
   private readonly _createdAt: Date;
-
   private readonly _status: CrawlStatus;
   private readonly _result?: CrawlResult;
   private readonly _errorMessage?: string;
@@ -56,8 +55,11 @@ export class Crawl {
     });
   }
 
-  static fromDynamoDBItem(item1: any, item2?: any) {
-    return new Crawl(item1);
+  static fromDynamoDBItem(item1: any, llmAnalysis?: any) {
+    return new Crawl({
+      ...item1,
+      llmAnalysis,
+    });
   }
 
   // Getters
@@ -150,8 +152,8 @@ export class Crawl {
       result: this._result ? JSON.stringify(this._result) : undefined,
       errorMessage: this._errorMessage,
       // llmAnalysis: this._llmAnalysis ? JSON.stringify(this._llmAnalysis.toJSON()) : undefined,
-      GSI1PK: `STATUS#${this._status}`,
-      GSI1SK: this._createdAt.toISOString(),
+      GSI1PK: `JOB#${this._jobId}`,
+      GSI1SK: `CRAWL#${this._createdAt.toISOString()}`,
     };
   }
 
@@ -173,10 +175,4 @@ export class Crawl {
       llmAnalysis: this._llmAnalysis,
     };
   }
-
-  /**
-   * 새롭
-   * @param crawlResults
-   */
-  public filterAlreadyCrawledUrls(crawlResults: CrawlResult[]) {}
 }

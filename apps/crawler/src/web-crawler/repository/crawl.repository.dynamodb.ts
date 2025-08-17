@@ -1,13 +1,4 @@
-import {
-  DynamoDBClient,
-  PutItemCommand,
-  GetItemCommand,
-  QueryCommand,
-  BatchGetItemCommand,
-  TransactWriteItemsCommand,
-  UpdateItemCommand,
-  DeleteItemCommand,
-} from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, GetItemCommand, QueryCommand, BatchGetItemCommand, TransactWriteItemsCommand } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 
 import { DynamoDBConfig } from '../../config/dynamodb.config';
@@ -38,7 +29,7 @@ export class CrawlRepositoryDynamoDB implements ICrawlRepository {
     transactItems.push({
       Put: {
         TableName: this._tableName,
-        Item: marshall(crawlItem),
+        Item: marshall(crawlItem, { removeUndefinedValues: true }),
         // 중복 방지 조건
         ConditionExpression: 'attribute_not_exists(PK) AND attribute_not_exists(SK)',
       },
@@ -50,7 +41,7 @@ export class CrawlRepositoryDynamoDB implements ICrawlRepository {
       transactItems.push({
         Put: {
           TableName: this._tableName,
-          Item: marshall(analysisItem),
+          Item: marshall(analysisItem, { removeUndefinedValues: true }),
         },
       });
     }
@@ -66,6 +57,7 @@ export class CrawlRepositoryDynamoDB implements ICrawlRepository {
       if ((error as Error).name === 'ConditionalCheckFailedException') {
         throw new Error(`Crawl with id ${crawl.id} already exists`);
       }
+      console.log(error);
       throw error;
     }
   }
@@ -78,7 +70,7 @@ export class CrawlRepositoryDynamoDB implements ICrawlRepository {
     transactItems.push({
       Put: {
         TableName: this._tableName,
-        Item: marshall(crawlItem),
+        Item: marshall(crawlItem, { removeUndefinedValues: true }),
       },
     });
 
@@ -88,7 +80,7 @@ export class CrawlRepositoryDynamoDB implements ICrawlRepository {
       transactItems.push({
         Put: {
           TableName: this._tableName,
-          Item: marshall(analysisItem),
+          Item: marshall(analysisItem, { removeUndefinedValues: true }),
         },
       });
     }
@@ -124,13 +116,50 @@ export class CrawlRepositoryDynamoDB implements ICrawlRepository {
     return Crawl.fromDynamoDBItem(crawlData);
   }
 
-  async findByIdWithAnalysis(requestId: string, crawlId: string): Promise<Crawl | null> {
+  async findJobCrawlsWithAnalyses(jobId: string): Promise<Crawl[]> {
+    // GSI1으로 Job의 모든 Crawl과 Analysis 조회
+    const result = await this._client.send(
+      new QueryCommand({
+        TableName: this._tableName,
+        IndexName: 'GSI1',
+        KeyConditionExpression: 'GSI1PK = :jobPK',
+        ExpressionAttributeValues: marshall({
+          ':jobPK': `JOB#${jobId}`,
+        }),
+      })
+    );
+
+    if (!result.Items || result.Items.length === 0) {
+      return [];
+    }
+
+    // jobs
+    const items = result.Items.map((item) => unmarshall(item));
+
+    const crawlItems = items.filter((item) => item.SK.startsWith('CRAWL#') || item.GSI1SK.startsWith('CRAWL#'));
+
+    const analysisItems = items.filter((item) => item.SK.startsWith('ANALYSIS#') || item.GSI1SK.startsWith('ANALYSIS#'));
+
+    // Crawl별로 Analysis 매핑
+    const crawlsWithAnalyses = crawlItems.map((crawlItem) => {
+      const crawlId = crawlItem.id;
+      const relatedAnalysis = analysisItems.find((analysisItem) => analysisItem.crawlId === crawlId);
+
+      const analysis = relatedAnalysis ? LLMAnalysis.fromDynamoDBItem(relatedAnalysis) : undefined;
+
+      return Crawl.fromDynamoDBItem(crawlItem, analysis);
+    });
+
+    return crawlsWithAnalyses;
+  }
+
+  async findByIdWithAnalysis(jobId: string, crawlId: string): Promise<Crawl | null> {
     // Batch로 Crawl과 Analysis 동시 조회
     const result = await this._client.send(
       new BatchGetItemCommand({
         RequestItems: {
           [this._tableName]: {
-            Keys: [marshall({ PK: `REQUEST#${requestId}`, SK: `CRAWL#${crawlId}` }), marshall({ PK: `REQUEST#${requestId}`, SK: `ANALYSIS#${crawlId}` })],
+            Keys: [marshall({ PK: `JOB#${jobId}`, SK: `CRAWl#${crawlId}` }), marshall({ PK: `CRAWL#${crawlId}`, SK: `ANALYSIS${crawlId}` })],
           },
         },
       })

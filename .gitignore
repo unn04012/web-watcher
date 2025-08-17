@@ -10,3 +10,8 @@ dist/
 .env
 
 .serverless/
+
+# development
+script/
+
+tsconfig.tsbuildinfo

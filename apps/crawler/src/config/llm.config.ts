@@ -12,4 +12,8 @@ export class LlmConfig {
 
     return claudeApiKey;
   }
+
+  get analyzePrompt() {
+    return this._configReader.getOrError('LLM_CRAWL_ANALYZE_PROMPT');
+  }
 }
