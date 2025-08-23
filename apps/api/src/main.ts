@@ -8,7 +8,7 @@ async function bootstrap() {
   const appConfig = app.get(AppConfig);
 
   await app.listen(appConfig.port, () => {
-    console.log(`API server is running on http://localhost:${appConfig.port}`);
+    console.log(`API server is running, port: ${appConfig.port}`);
   });
 }
 bootstrap();

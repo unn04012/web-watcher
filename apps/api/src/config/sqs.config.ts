@@ -2,14 +2,13 @@ import { Inject } from '@nestjs/common';
 import { IConfigReader } from '@web-watcher/shared';
 import { Symbols } from 'constants/symbols';
 
-export class AppConfig {
+export class SQSConfig {
   constructor(@Inject(Symbols.configReader) private readonly _configReader: IConfigReader) {}
 
-  get port() {
-    return Number(this._configReader.getOrDefault('API_PORT', '3000'));
+  get queueUrl(): string {
+    return this._configReader.getOrError('SQS_QUEUE_URL');
   }
-
-  get apiKey() {
-    return this._configReader.getOrError('API_KEY');
+  get region(): string {
+    return this._configReader.getOrDefault('SQS_REGION', 'ap-northeast-2');
   }
 }
