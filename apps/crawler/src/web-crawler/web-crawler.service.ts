@@ -30,7 +30,5 @@ export class WebCrawlerService {
     await this._crawlRepository.save(crawl);
 
     await this.sqsService.sendMessage(analyzedResult.getAnalyzeContent());
-
-    //TODO send SQS
   }
 }
