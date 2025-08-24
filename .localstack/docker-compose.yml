@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # LocalStack for AWS services
+  localstack:
+    image: localstack/localstack:latest
+    container_name: web-watcher-localstack
+    environment:
+      # LocalStack configuration
+      SERVICES: sqs,eventbridge
+      DEBUG: 1
+      LAMBDA_EXECUTOR: docker
+      DOCKER_HOST: unix:///var/run/docker.sock
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      # SQS Configuration
+      SQS_ENDPOINT_STRATEGY: standard
+    ports:
+      - '4566:4566' # LocalStack main port
+      - '4510-4559:4510-4559' # LocalStack service ports
+    volumes:
+      - '${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:4566/_localstack/health']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # LocalStack initialization container - 수정된 버전
+  localstack-init:
+    # 방법 1: 동일한 플랫폼 사용
+    image: amazon/aws-cli:latest
+    container_name: web-watcher-localstack-init
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_DEFAULT_REGION: us-east-1
+      #AWS_ENDPOINT_URL: http://localstack:4566
+    volumes:
+      - ./setup.sh:/setup.sh
+    entrypoint: ['/bin/bash'] # ← ENTRYPOINT 오버라이드
+    command: ['/setup.sh']
+    restart: 'no'
+
+networks:
+  default:
+    name: web-watcher-network

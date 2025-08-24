@@ -1,11 +1,12 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, LoggerService } from '@nestjs/common';
 import { CrawlDto } from '@web-watcher/shared';
 import { SQSConfig } from 'src/config/sqs.config';
 
 @Injectable()
 export class SqsService {
   private readonly _sqsClient: SQSClient;
+  private readonly _logger = new Logger(SqsService.name);
 
   constructor(private readonly _sqsConfig: SQSConfig) {
     this._sqsClient = new SQSClient({ region: this._sqsConfig.region });
@@ -24,5 +25,7 @@ export class SqsService {
     });
 
     await this._sqsClient.send(command);
+
+    this._logger.log(`Message sent to SQS queue: ${queueUrl}`);
   }
 }
