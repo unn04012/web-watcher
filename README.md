@@ -1,6 +1,8 @@
 # web-watcher
 
-🔍 Smart web monitoring system that tracks website changes and sends intelligent notifications based on user-defined categories and interests
+🔍 사용자 맞춤형 웹사이트 변경 추적 및 지능형 알림 시스템. LLM을 활용하여 각 웹사이트의 다양한 HTML 태그 구조를 자동 분석하고, 사용자 관심사에 따른 변경사항을 스마트하게 감지하는 AI 기반 웹 모니터링 플랫폼
+
+## System Architecture
 
 ![Web Watcher Architecture](./web-watcher.drawio.svg)
 
