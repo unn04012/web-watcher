@@ -28,7 +28,7 @@
     "jest": "^30.0.5",
     "nx": "^17.0.0",
     "ts-jest": "^29.4.1",
-    "typescript": "^5.0.0"
+    "typescript": "^5.9.2"
   },
   "dependencies": {
     "@ssut/nestjs-sqs": "^3.0.1"

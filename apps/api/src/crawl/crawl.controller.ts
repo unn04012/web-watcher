@@ -7,7 +7,7 @@ export class CrawlController {
   constructor(private readonly _crawlService: CrawlService) {}
 
   @Post()
-  public async startCrawl(dto: StartCrawlDto) {
-    await this._crawlService.startCrawl(dto);
+  public async registerCrawl(dto: StartCrawlDto) {
+    await this._crawlService.registerCrawl(dto);
   }
 }
